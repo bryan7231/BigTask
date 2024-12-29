@@ -1,0 +1,24 @@
+{
+  "name": "bigtask",
+  "version": "1.0.0",
+  "description": "A multi-platform automation tool designed as a replacement for TinyTask.",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bryan7231/BigTask.git"
+  },
+  "author": "bryan7231",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bryan7231/BigTask/issues"
+  },
+  "homepage": "https://github.com/bryan7231/BigTask#readme",
+  "devDependencies": {
+    "electron": "^33.2.1"
+  }
+}
