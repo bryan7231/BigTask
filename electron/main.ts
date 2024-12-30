@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
@@ -28,10 +28,20 @@ let win: BrowserWindow | null
 
 function createWindow() {
   win = new BrowserWindow({
+    width: 500,
+    height: 125,
     icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
+    // resizable: false, 
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
     },
+  })
+
+  win.setMenuBarVisibility(false);
+
+  win.on('resize', () => {
+    const [width, height] = win?.getSize();
+    console.log(`Width: ${width}, Height: ${height}`);
   })
 
   // Test active push message to Renderer-process.
@@ -46,6 +56,10 @@ function createWindow() {
     win.loadFile(path.join(RENDERER_DIST, 'index.html'))
   }
 }
+
+ipcMain.on('terminal-log', (_event, message) => {
+  console.log("From renderer: ", message);
+});
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits

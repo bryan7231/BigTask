@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron";
+import { ipcMain, app, BrowserWindow } from "electron";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
@@ -12,10 +12,18 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 
 let win;
 function createWindow() {
   win = new BrowserWindow({
+    width: 500,
+    height: 125,
     icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
+    // resizable: false, 
     webPreferences: {
       preload: path.join(__dirname, "preload.mjs")
     }
+  });
+  win.setMenuBarVisibility(false);
+  win.on("resize", () => {
+    const [width, height] = win == null ? void 0 : win.getSize();
+    console.log(`Width: ${width}, Height: ${height}`);
   });
   win.webContents.on("did-finish-load", () => {
     win == null ? void 0 : win.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
@@ -26,6 +34,9 @@ function createWindow() {
     win.loadFile(path.join(RENDERER_DIST, "index.html"));
   }
 }
+ipcMain.on("terminal-log", (_event, message) => {
+  console.log("From renderer: ", message);
+});
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
