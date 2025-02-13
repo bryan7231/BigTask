@@ -2,26 +2,34 @@ import React, { useRef } from 'react';
 
 import './OpenIcon.css';
 import icon from './assets/react.svg';
+import UserEvent from './UserEvent';
 
 interface OpenIconProps {
-    changeFile: (f: File | null ) => void;
+    changeRec: (rec: UserEvent[]) => void;
 }
 
-function OpenIcon({ changeFile }: OpenIconProps) {
+function OpenIcon({ changeRec }: OpenIconProps) {
     const fileInputRef: React.RefObject<HTMLInputElement> = useRef(null);
 
     const handleImgClick = () => {
         fileInputRef.current?.click();
     }
 
+    const convertToList = (f: File | null) => {
+        window.ipcRenderer.send("terminal-log", f?.name);
+        const ret: UserEvent[] = [];
+
+        return ret; 
+    }
+
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files) changeFile(event.target.files.item(0));
+        if (event.target.files) changeRec(convertToList(event.target.files.item(0)));
     }
 
     return (
-    <div>
+    <div className='icons'>
         <input type='file' className="file-input" ref={fileInputRef} onChange={handleFileChange}/>
-        <img src={icon} onClick={handleImgClick} className="open-icon"/>
+        <img src={icon} onClick={handleImgClick} className="icons open-icon"/>
     </div>
     );
 }

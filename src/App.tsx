@@ -2,19 +2,23 @@ import { useState } from 'react';
 
 import './App.css'
 import OpenIcon from './OpenIcon'
+import PlayIcon from './PlayIcon';
+import RecordIcon from './RecordIcon';
+import UserEvent from './UserEvent';
 
 function App() {
-  const [currFile, setFile] = useState<File | null>(null);
+  const [currRec, setRec] = useState<UserEvent[]>([]);
 
-  const changeFile = (f: File | null) => {
-    window.ipcRenderer.send('terminal-log', f?.path);
-    setFile(f);
+  const changeRec = (rec: UserEvent[]) => {
+    setRec(rec);
   }
 
   return (
     <>
       <div className="main-container">
-        <OpenIcon changeFile={changeFile}/>
+        <OpenIcon changeRec={changeRec}/>
+        <PlayIcon currRec={currRec}/>
+        <RecordIcon changeRec={changeRec} />
       </div>
     </>
   )

@@ -7,3 +7,8 @@
   justify-content: space-evenly;
   width: 100vw; 
 }
+
+.icons {
+  width: 60px;
+  height: 60px; 
+}

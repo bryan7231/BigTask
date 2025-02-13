@@ -1,7 +1,9 @@
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain} from 'electron'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
+import { uIOhook, UiohookKey } from 'uiohook-napi';
+import KeyboardEvent from '../src/KeyboardEvent';
 
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -25,6 +27,8 @@ export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist')
 process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 'public') : RENDERER_DIST
 
 let win: BrowserWindow | null
+
+
 
 function createWindow() {
   win = new BrowserWindow({
@@ -58,8 +62,20 @@ function createWindow() {
 }
 
 ipcMain.on('terminal-log', (_event, message) => {
-  console.log("From renderer: ", message);
+  console.log(message);
 });
+
+ipcMain.on('start-logging', () => {
+  uIOhook.start();
+})
+
+ipcMain.on('stop-logging', () => {
+  uIOhook.stop();
+})
+
+ipcMain.handle("get-time", () => {
+  return Date.now();
+})
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
@@ -79,4 +95,16 @@ app.on('activate', () => {
   }
 })
 
-app.whenReady().then(createWindow)
+void app.whenReady().then(() => {
+  createWindow();
+
+  uIOhook.on('keydown', (event) => {
+    const data: KeyboardEvent = new KeyboardEvent("down", Date.now(), event.keycode);
+    win?.webContents.send("key-event", data)
+  });
+
+  uIOhook.on('keyup', (event) => {
+    const data: KeyboardEvent = new KeyboardEvent(event.type, Date.now(), event.keycode);
+    win?.webContents.send("key-event", data);
+  });
+});
